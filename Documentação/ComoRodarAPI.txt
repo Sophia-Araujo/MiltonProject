@@ -1,0 +1,11 @@
+# Certifique-se de que o ambiente está ativado:
+.\venv\Scripts\activate
+
+# Instale/reinstale as dependências:
+pip install -r requirements.txt
+
+# Verificar se esta no ar 
+python -m uvicorn main:app --reload
+
+http://127.0.0.1:8000/
+http://127.0.0.1:8000/docs
