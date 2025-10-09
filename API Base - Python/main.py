@@ -1,108 +1,125 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from typing import List, Optional
-
-# Importa os modelos definidos
-from models import Contact, ContactBase 
+from sqlalchemy.orm import Session
+import uvicorn
 
 # ----------------------------------------------------
-# 1. Configuração da Aplicação e Armazenamento em Memória
+# 1. Configuração da Aplicação e Importações de DB
 # ----------------------------------------------------
+from models import Contact as PydanticContact, ContactBase # Renomeia o modelo Pydantic
+from database import SessionLocal, create_db_and_tables # Importa as ferramentas de DB
+from database import Contact as DBContact # Importa o modelo ORM do DB
+
 app = FastAPI(
     title="Microserviço de Agendamento e Comunicação - MVP",
     description="API REST para gerenciar contatos e agendamentos.",
     version="0.1.0"
 )
 
-# Simulação de Banco de Dados (In-Memory para o MVP inicial)
-in_memory_contacts: List[Contact] = []
-next_id = 1
-
-# Função auxiliar para encontrar um contato e retornar o índice
-def get_contact_index(contact_id: int) -> int:
-    """Busca o índice do contato na lista, levanta 404 se não encontrado."""
+# Função para obter a sessão do banco de dados (Dependency Injection)
+# O 'yield' garante que a sessão seja fechada automaticamente após a requisição
+def get_db():
+    db = SessionLocal()
     try:
-        index = next(i for i, c in enumerate(in_memory_contacts) if c.id == contact_id)
-        return index
-    except StopIteration:
-        raise HTTPException(status_code=404, detail="Contato não encontrado.")
+        yield db
+    finally:
+        db.close()
 
+# Hook para criar o DB e tabelas na inicialização
+@app.on_event("startup")
+def startup_event():
+    create_db_and_tables()
 
 # ----------------------------------------------------
-# 2. Endpoints (CRUD Completo de Contatos)
+# 2. Endpoints (CRUD Completo de Contatos - Agora com Persistência)
 # ----------------------------------------------------
 
 # Health Check (GET /)
 @app.get("/")
 def health_check():
-    """Verifica o status da API."""
     return {"status": "ok", "service": "Communication and Scheduling Microservice"}
 
 # CREATE (POST /contacts/)
-@app.post("/contacts/", response_model=Contact, status_code=201, tags=["Contatos"])
-def create_contact(contact: ContactBase):
+@app.post("/contacts/", response_model=PydanticContact, status_code=201, tags=["Contatos"])
+# O parâmetro 'db' recebe a sessão do banco de dados
+def create_contact(contact: ContactBase, db: Session = Depends(get_db)):
     """
-    Registra um novo contato no sistema.
+    Registra um novo contato no sistema e o salva no banco de dados.
     """
-    global next_id
-    
-    # Verifica se o email já existe (simulação de unicidade)
-    if any(c.email.lower() == contact.email.lower() for c in in_memory_contacts):
-        raise HTTPException(
-            status_code=400, detail="Email já cadastrado."
-        )
+    # 1. Verifica se o email já existe (Query no DB)
+    db_contact = db.query(DBContact).filter(DBContact.email == contact.email).first()
+    if db_contact:
+        raise HTTPException(status_code=400, detail="Email já cadastrado.")
 
-    # Cria o novo objeto Contact com o ID
-    new_contact = Contact(id=next_id, **contact.model_dump())
-    in_memory_contacts.append(new_contact)
-    next_id += 1
-    
-    return new_contact
+    # 2. Cria o objeto ORM e o adiciona ao DB
+    db_contact = DBContact(**contact.model_dump())
+    db.add(db_contact)
+    db.commit()
+    db.refresh(db_contact) # Garante que o ID gerado pelo DB seja populado
+
+    return db_contact
 
 # READ ALL (GET /contacts/)
-@app.get("/contacts/", response_model=List[Contact], tags=["Contatos"])
-def list_contacts():
+@app.get("/contacts/", response_model=List[PydanticContact], tags=["Contatos"])
+def list_contacts(db: Session = Depends(get_db)):
     """
-    Lista todos os contatos registrados.
+    Lista todos os contatos registrados no banco de dados.
     """
-    return in_memory_contacts
+    contacts = db.query(DBContact).all()
+    return contacts
 
 # READ BY ID (GET /contacts/{contact_id})
-@app.get("/contacts/{contact_id}", response_model=Contact, tags=["Contatos"])
-def read_contact(contact_id: int):
+@app.get("/contacts/{contact_id}", response_model=PydanticContact, tags=["Contatos"])
+def read_contact(contact_id: int, db: Session = Depends(get_db)):
     """
     Busca um contato específico pelo ID.
     """
-    index = get_contact_index(contact_id)
-    return in_memory_contacts[index]
+    db_contact = db.query(DBContact).filter(DBContact.id == contact_id).first()
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail="Contato não encontrado.")
+    return db_contact
 
 # UPDATE (PUT /contacts/{contact_id})
-@app.put("/contacts/{contact_id}", response_model=Contact, tags=["Contatos"])
-def update_contact(contact_id: int, contact: ContactBase):
+@app.put("/contacts/{contact_id}", response_model=PydanticContact, tags=["Contatos"])
+def update_contact(contact_id: int, contact: ContactBase, db: Session = Depends(get_db)):
     """
     Atualiza todas as informações de um contato existente.
     """
-    index = get_contact_index(contact_id)
+    db_contact = db.query(DBContact).filter(DBContact.id == contact_id).first()
     
-    # Verifica unicidade do email, exceto o contato atual
-    if any(c.email.lower() == contact.email.lower() and c.id != contact_id for c in in_memory_contacts):
-        raise HTTPException(
-            status_code=400, detail="Outro contato já cadastrado com este email."
-        )
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail="Contato não encontrado.")
 
-    # Cria um objeto Contact atualizado, mantendo o ID original
-    updated_contact = Contact(id=contact_id, **contact.model_dump())
-    in_memory_contacts[index] = updated_contact
+    # Verifica unicidade do email, exceto o contato atual
+    email_exists = db.query(DBContact).filter(
+        DBContact.email == contact.email, 
+        DBContact.id != contact_id
+    ).first()
+    if email_exists:
+        raise HTTPException(status_code=400, detail="Outro contato já cadastrado com este email.")
+
+    # Aplica as novas informações
+    db_contact.name = contact.name
+    db_contact.email = contact.email
+    db_contact.phone = contact.phone
     
-    return updated_contact
+    db.commit()
+    db.refresh(db_contact)
+    
+    return db_contact
 
 # DELETE (DELETE /contacts/{contact_id})
 @app.delete("/contacts/{contact_id}", status_code=204, tags=["Contatos"])
-def delete_contact(contact_id: int):
+def delete_contact(contact_id: int, db: Session = Depends(get_db)):
     """
     Remove um contato do sistema.
     """
-    index = get_contact_index(contact_id)
-    in_memory_contacts.pop(index)
+    db_contact = db.query(DBContact).filter(DBContact.id == contact_id).first()
     
-    # Retorna 204 No Content, que é o padrão para DELETE bem-sucedido
+    if db_contact is None:
+        raise HTTPException(status_code=404, detail="Contato não encontrado.")
+    
+    db.delete(db_contact)
+    db.commit()
+    
     return
