@@ -34,7 +34,8 @@ class Contact(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     phone = Column(String, nullable=True) # Opcional no Pydantic, nullable no DB
-
+    codExterno = Column(String, nullable=True, unique=True)
+    canalPref = Column(String)
 # Cria as tabelas no banco de dados (se não existirem)
 def create_db_and_tables():
     Base.metadata.create_all(bind=engine)
