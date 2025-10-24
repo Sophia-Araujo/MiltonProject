@@ -1,0 +1,1222 @@
+{
+	"info": {
+		"_postman_id": "24ed8122-cd14-4a60-8d70-9ed7a2474346",
+		"name": "Microserviço de Agendamento e Comunicação",
+		"description": "API REST para gerenciamento de contatos, agendamentos e envio automatizado de comunicações (e-mail e WhatsApp)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48871649"
+	},
+	"item": [
+		{
+			"name": "1. Gestão de Contatos",
+			"item": [
+				{
+					"name": "Criar Contato",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@example.com\",\n  \"telefone\": \"+5511987654321\",\n  \"observacao\": \"Cliente preferencial - contato comercial\",\n  \"codExterno\": \"CLI-2025-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos"
+							]
+						},
+						"description": "Cria um novo contato no sistema"
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@example.com\",\n  \"telefone\": \"+5511987654321\",\n  \"observacao\": \"Cliente preferencial\",\n  \"codExterno\": \"CLI-2025-001\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/contatos",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"contatos"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"id\": 1,\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@example.com\",\n  \"telefone\": \"+5511987654321\",\n  \"observacao\": \"Cliente preferencial\",\n  \"codExterno\": \"CLI-2025-001\",\n  \"criadoEm\": \"2025-10-02T10:30:00Z\",\n  \"atualizadoEm\": \"2025-10-02T10:30:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Listar Contatos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos?page=0&size=20&sort=nome,asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Número da página (inicia em 0)"
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Quantidade de registros por página"
+								},
+								{
+									"key": "sort",
+									"value": "nome,asc",
+									"description": "Campo e direção de ordenação"
+								},
+								{
+									"key": "nome",
+									"value": "João",
+									"description": "Filtro por nome (opcional)",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "joao@example.com",
+									"description": "Filtro por email (opcional)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista todos os contatos com paginação e filtros opcionais"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Contato por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contatos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"1"
+							]
+						},
+						"description": "Busca um contato específico pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Contato por Código Externo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contatos/codigo-externo/CLI-2025-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"codigo-externo",
+								"CLI-2025-001"
+							]
+						},
+						"description": "Busca um contato pelo código externo"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Contato",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva Santos\",\n  \"email\": \"joao.silva@example.com\",\n  \"telefone\": \"+5511987654321\",\n  \"observacao\": \"Cliente VIP - atualizado\",\n  \"codExterno\": \"CLI-2025-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"1"
+							]
+						},
+						"description": "Atualiza um contato existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar Contato",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contatos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"1"
+							]
+						},
+						"description": "Remove um contato do sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Importar Contatos (CSV)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "arquivo",
+									"description": "Arquivo CSV com colunas: nome,email,telefone,observacao,codExterno",
+									"type": "file",
+									"src": "/path/to/contatos.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos/importar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"importar"
+							]
+						},
+						"description": "Importa múltiplos contatos via arquivo CSV"
+					},
+					"response": []
+				},
+				{
+					"name": "Exportar Contatos (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contatos/exportar?formato=csv",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"exportar"
+							],
+							"query": [
+								{
+									"key": "formato",
+									"value": "csv",
+									"description": "Formato de exportação (csv, xlsx)"
+								}
+							]
+						},
+						"description": "Exporta todos os contatos em formato CSV"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Gestão de Agendamentos",
+			"item": [
+				{
+					"name": "Criar Agendamento Único",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Lembrete de Consulta\",\n  \"descricao\": \"Enviar lembrete de consulta médica\",\n  \"tipo\": \"UNICO\",\n  \"dataHoraExecucao\": \"2025-10-15T14:00:00Z\",\n  \"contatosIds\": [1, 2, 3],\n  \"mensagem\": {\n    \"assunto\": \"Lembrete: Consulta Médica\",\n    \"corpo\": \"Olá {{nome}}, este é um lembrete sobre sua consulta agendada para amanhã às 15h.\",\n    \"canais\": [\"EMAIL\", \"WHATSAPP\"]\n  },\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos"
+							]
+						},
+						"description": "Cria um agendamento para execução única"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Agendamento Recorrente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Newsletter Mensal\",\n  \"descricao\": \"Envio mensal de newsletter aos clientes\",\n  \"tipo\": \"RECORRENTE\",\n  \"dataInicio\": \"2025-10-01T09:00:00Z\",\n  \"recorrencia\": {\n    \"frequencia\": \"MENSAL\",\n    \"intervalo\": 1,\n    \"diaDaSemana\": null,\n    \"diaDoMes\": 1,\n    \"horaExecucao\": \"09:00\"\n  },\n  \"contatosIds\": [1, 2, 3, 4, 5],\n  \"mensagem\": {\n    \"assunto\": \"Newsletter - Outubro 2025\",\n    \"corpo\": \"Olá {{nome}}, confira as novidades deste mês!\",\n    \"canais\": [\"EMAIL\"]\n  },\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos"
+							]
+						},
+						"description": "Cria um agendamento com recorrência (diária, semanal, mensal)"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Agendamentos",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "tipo",
+									"value": "RECORRENTE",
+									"description": "Filtro por tipo (UNICO, RECORRENTE)",
+									"disabled": true
+								},
+								{
+									"key": "ativo",
+									"value": "true",
+									"description": "Filtro por status ativo",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista todos os agendamentos com filtros opcionais"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Agendamento por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/agendamentos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos",
+								"1"
+							]
+						},
+						"description": "Busca um agendamento específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Agendamento",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Newsletter Mensal - Atualizado\",\n  \"descricao\": \"Envio mensal de newsletter aos clientes VIP\",\n  \"tipo\": \"RECORRENTE\",\n  \"dataInicio\": \"2025-10-01T09:00:00Z\",\n  \"recorrencia\": {\n    \"frequencia\": \"MENSAL\",\n    \"intervalo\": 1,\n    \"diaDaSemana\": null,\n    \"diaDoMes\": 5,\n    \"horaExecucao\": \"10:00\"\n  },\n  \"contatosIds\": [1, 2, 3],\n  \"mensagem\": {\n    \"assunto\": \"Newsletter VIP - Outubro 2025\",\n    \"corpo\": \"Olá {{nome}}, confira nossas ofertas exclusivas!\",\n    \"canais\": [\"EMAIL\", \"WHATSAPP\"]\n  },\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos",
+								"1"
+							]
+						},
+						"description": "Atualiza um agendamento existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Ativar/Desativar Agendamento",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ativo\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos",
+								"1",
+								"status"
+							]
+						},
+						"description": "Ativa ou desativa um agendamento"
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar Agendamento",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/agendamentos/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos",
+								"1"
+							]
+						},
+						"description": "Remove um agendamento do sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Executar Agendamento Manualmente",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/agendamentos/1/executar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos",
+								"1",
+								"executar"
+							]
+						},
+						"description": "Executa um agendamento imediatamente (útil para testes)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Comunicação",
+			"item": [
+				{
+					"name": "Enviar Mensagem Imediata",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contatosIds\": [1, 2],\n  \"assunto\": \"Notificação Urgente\",\n  \"corpo\": \"Olá {{nome}}, esta é uma mensagem importante sobre sua conta.\",\n  \"canais\": [\"EMAIL\", \"WHATSAPP\"],\n  \"prioridade\": \"ALTA\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/comunicacao/enviar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"enviar"
+							]
+						},
+						"description": "Envia uma mensagem imediatamente para os contatos especificados"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar E-mail",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"destinatarios\": [\"joao.silva@example.com\", \"maria.santos@example.com\"],\n  \"assunto\": \"Confirmação de Pedido\",\n  \"corpo\": \"Seu pedido #12345 foi confirmado com sucesso!\",\n  \"corpoHtml\": \"<h1>Confirmação de Pedido</h1><p>Seu pedido <strong>#12345</strong> foi confirmado!</p>\",\n  \"anexos\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/comunicacao/email",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"email"
+							]
+						},
+						"description": "Envia um e-mail específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Enviar WhatsApp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"telefones\": [\"+5511987654321\", \"+5511876543210\"],\n  \"mensagem\": \"Olá! Seu pedido está a caminho. Código de rastreamento: BR123456789.\",\n  \"templateId\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/comunicacao/whatsapp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"whatsapp"
+							]
+						},
+						"description": "Envia uma mensagem via WhatsApp"
+					},
+					"response": []
+				},
+				{
+					"name": "Histórico de Mensagens",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comunicacao/historico?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"historico"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "contatoId",
+									"value": "1",
+									"description": "Filtro por contato",
+									"disabled": true
+								},
+								{
+									"key": "canal",
+									"value": "EMAIL",
+									"description": "Filtro por canal (EMAIL, WHATSAPP)",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "ENVIADO",
+									"description": "Filtro por status (ENVIADO, FALHA, PENDENTE)",
+									"disabled": true
+								},
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01",
+									"description": "Data início do período",
+									"disabled": true
+								},
+								{
+									"key": "dataFim",
+									"value": "2025-10-31",
+									"description": "Data fim do período",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Consulta o histórico de mensagens enviadas"
+					},
+					"response": [
+						{
+							"name": "Exemplo de Resposta",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/comunicacao/historico",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"comunicacao",
+										"historico"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"contatoId\": 1,\n      \"contatoNome\": \"João Silva\",\n      \"contatoEmail\": \"joao.silva@example.com\",\n      \"contatoTelefone\": \"+5511987654321\",\n      \"agendamentoId\": 5,\n      \"agendamentoNome\": \"Lembrete de Consulta\",\n      \"canal\": \"EMAIL\",\n      \"assunto\": \"Lembrete: Consulta Médica\",\n      \"corpo\": \"Olá João Silva, este é um lembrete sobre sua consulta...\",\n      \"status\": \"ENVIADO\",\n      \"dataEnvio\": \"2025-10-02T10:30:00Z\",\n      \"dataLeitura\": \"2025-10-02T11:15:00Z\",\n      \"tentativas\": 1,\n      \"erroMensagem\": null,\n      \"remetenteAplicacao\": \"Sistema Clínica\",\n      \"remetenteCodExterno\": \"APP-CLINICA-001\"\n    },\n    {\n      \"id\": 2,\n      \"contatoId\": 2,\n      \"contatoNome\": \"Maria Santos\",\n      \"contatoEmail\": null,\n      \"contatoTelefone\": \"+5511876543210\",\n      \"agendamentoId\": 5,\n      \"agendamentoNome\": \"Lembrete de Consulta\",\n      \"canal\": \"WHATSAPP\",\n      \"assunto\": null,\n      \"corpo\": \"Olá Maria Santos, este é um lembrete sobre sua consulta...\",\n      \"status\": \"ENVIADO\",\n      \"dataEnvio\": \"2025-10-02T10:30:05Z\",\n      \"dataLeitura\": null,\n      \"tentativas\": 1,\n      \"erroMensagem\": null,\n      \"remetenteAplicacao\": \"Sistema Clínica\",\n      \"remetenteCodExterno\": \"APP-CLINICA-001\"\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 20\n  },\n  \"totalElements\": 2,\n  \"totalPages\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "Histórico por Contato",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comunicacao/historico/contato/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"historico",
+								"contato",
+								"1"
+							]
+						},
+						"description": "Busca todo o histórico de comunicação de um contato específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocessar Falhas",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comunicacao/reprocessar-falhas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"reprocessar-falhas"
+							]
+						},
+						"description": "Reprocessa todas as mensagens com status de falha"
+					},
+					"response": []
+				},
+				{
+					"name": "Reprocessar Mensagem Específica",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/comunicacao/historico/1/reprocessar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"comunicacao",
+								"historico",
+								"1",
+								"reprocessar"
+							]
+						},
+						"description": "Reprocessa uma mensagem específica que falhou"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Configuração",
+			"item": [
+				{
+					"name": "Configurar SMTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"host\": \"smtp.gmail.com\",\n  \"porta\": 587,\n  \"usuario\": \"noreply@example.com\",\n  \"senha\": \"sua_senha_aqui\",\n  \"tls\": true,\n  \"ssl\": false,\n  \"remetenteNome\": \"Sistema de Notificações\",\n  \"remetenteEmail\": \"noreply@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/configuracao/smtp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"configuracao",
+								"smtp"
+							]
+						},
+						"description": "Configura as credenciais do servidor SMTP para envio de e-mails"
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Configuração SMTP",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/configuracao/smtp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"configuracao",
+								"smtp"
+							]
+						},
+						"description": "Retorna a configuração atual do WhatsApp (sem expor tokens)"
+					},
+					"response": []
+				},
+				{
+					"name": "Testar Configuração WhatsApp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"telefoneDestino\": \"+5511987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/configuracao/whatsapp/testar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"configuracao",
+								"whatsapp",
+								"testar"
+							]
+						},
+						"description": "Envia uma mensagem de teste via WhatsApp para validar a configuração"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Canais Ativos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/configuracao/canais",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"configuracao",
+								"canais"
+							]
+						},
+						"description": "Lista todos os canais de comunicação configurados e seus status"
+					},
+					"response": [
+						{
+							"name": "Exemplo de Resposta",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/configuracao/canais",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"configuracao",
+										"canais"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"canais\": [\n    {\n      \"tipo\": \"EMAIL\",\n      \"ativo\": true,\n      \"configurado\": true,\n      \"ultimoTeste\": \"2025-10-02T09:00:00Z\",\n      \"statusTeste\": \"SUCESSO\"\n    },\n    {\n      \"tipo\": \"WHATSAPP\",\n      \"ativo\": true,\n      \"configurado\": true,\n      \"ultimoTeste\": \"2025-10-01T15:30:00Z\",\n      \"statusTeste\": \"SUCESSO\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "5. Health Check e Monitoramento",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Verifica o status de saúde da aplicação"
+					},
+					"response": []
+				},
+				{
+					"name": "Estatísticas do Sistema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/estatisticas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estatisticas"
+							]
+						},
+						"description": "Retorna estatísticas gerais do sistema"
+					},
+					"response": [
+						{
+							"name": "Exemplo de Resposta",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/estatisticas",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"estatisticas"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"totalContatos\": 1523,\n  \"totalAgendamentos\": 45,\n  \"agendamentosAtivos\": 32,\n  \"mensagensEnviadas\": 8945,\n  \"mensagensHoje\": 127,\n  \"mensagensComFalha\": 23,\n  \"taxaSucesso\": 99.7,\n  \"canaisConfigurados\": [\"EMAIL\", \"WHATSAPP\"],\n  \"ultimaAtualizacao\": \"2025-10-02T10:45:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logs do Sistema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/logs?nivel=ERROR&dataInicio=2025-10-01&limite=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"logs"
+							],
+							"query": [
+								{
+									"key": "nivel",
+									"value": "ERROR",
+									"description": "Nível do log (INFO, WARN, ERROR)"
+								},
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01",
+									"description": "Data início da consulta"
+								},
+								{
+									"key": "limite",
+									"value": "100",
+									"description": "Quantidade máxima de registros"
+								}
+							]
+						},
+						"description": "Consulta os logs do sistema"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Relatórios",
+			"item": [
+				{
+					"name": "Relatório de Envios por Período",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/relatorios/envios?dataInicio=2025-10-01&dataFim=2025-10-31&agruparPor=DIA",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"relatorios",
+								"envios"
+							],
+							"query": [
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01"
+								},
+								{
+									"key": "dataFim",
+									"value": "2025-10-31"
+								},
+								{
+									"key": "agruparPor",
+									"value": "DIA",
+									"description": "Agrupamento (DIA, SEMANA, MES)"
+								},
+								{
+									"key": "canal",
+									"value": "EMAIL",
+									"description": "Filtro por canal",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Gera relatório de mensagens enviadas no período"
+					},
+					"response": []
+				},
+				{
+					"name": "Relatório de Performance por Canal",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/relatorios/performance-canais?dataInicio=2025-10-01&dataFim=2025-10-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"relatorios",
+								"performance-canais"
+							],
+							"query": [
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01"
+								},
+								{
+									"key": "dataFim",
+									"value": "2025-10-31"
+								}
+							]
+						},
+						"description": "Compara a performance de cada canal de comunicação"
+					},
+					"response": []
+				},
+				{
+					"name": "Relatório de Agendamentos Executados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/relatorios/agendamentos-executados?dataInicio=2025-10-01&dataFim=2025-10-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"relatorios",
+								"agendamentos-executados"
+							],
+							"query": [
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01"
+								},
+								{
+									"key": "dataFim",
+									"value": "2025-10-31"
+								}
+							]
+						},
+						"description": "Lista todos os agendamentos executados no período"
+					},
+					"response": []
+				},
+				{
+					"name": "Relatório de Contatos mais Contatados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/relatorios/top-contatos?limite=50&dataInicio=2025-10-01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"relatorios",
+								"top-contatos"
+							],
+							"query": [
+								{
+									"key": "limite",
+									"value": "50",
+									"description": "Quantidade de contatos no ranking"
+								},
+								{
+									"key": "dataInicio",
+									"value": "2025-10-01",
+									"description": "Início do período de análise"
+								}
+							]
+						},
+						"description": "Lista os contatos que mais receberam comunicações"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exemplos de Uso Completo",
+			"item": [
+				{
+					"name": "Fluxo 1: Criar Contato e Enviar Mensagem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// PASSO 1: Criar o contato\n// POST {{base_url}}/contatos\n{\n  \"nome\": \"Pedro Oliveira\",\n  \"email\": \"pedro.oliveira@example.com\",\n  \"telefone\": \"+5511999887766\",\n  \"observacao\": \"Cliente novo - primeira compra\",\n  \"codExterno\": \"CLI-2025-100\"\n}\n\n// PASSO 2: Enviar mensagem de boas-vindas\n// POST {{base_url}}/comunicacao/enviar\n{\n  \"contatosIds\": [100],\n  \"assunto\": \"Bem-vindo à nossa plataforma!\",\n  \"corpo\": \"Olá Pedro Oliveira, seja muito bem-vindo! Estamos felizes em tê-lo conosco.\",\n  \"canais\": [\"EMAIL\", \"WHATSAPP\"],\n  \"prioridade\": \"NORMAL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos"
+							]
+						},
+						"description": "Exemplo de fluxo completo: criar contato e enviar mensagem de boas-vindas"
+					},
+					"response": []
+				},
+				{
+					"name": "Fluxo 2: Agendamento Recorrente com Múltiplos Contatos",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// Criar agendamento semanal de relatórios\n{\n  \"nome\": \"Relatório Semanal de Vendas\",\n  \"descricao\": \"Envio automático do relatório semanal toda segunda-feira\",\n  \"tipo\": \"RECORRENTE\",\n  \"dataInicio\": \"2025-10-06T08:00:00Z\",\n  \"recorrencia\": {\n    \"frequencia\": \"SEMANAL\",\n    \"intervalo\": 1,\n    \"diaDaSemana\": \"SEGUNDA\",\n    \"diaDoMes\": null,\n    \"horaExecucao\": \"08:00\"\n  },\n  \"contatosIds\": [1, 2, 3, 4, 5, 10, 15, 20],\n  \"mensagem\": {\n    \"assunto\": \"Relatório Semanal - Vendas\",\n    \"corpo\": \"Olá {{nome}},\\n\\nSegue o relatório semanal de vendas em anexo.\\n\\nAtenciosamente,\\nEquipe Comercial\",\n    \"canais\": [\"EMAIL\"]\n  },\n  \"ativo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/agendamentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"agendamentos"
+							]
+						},
+						"description": "Exemplo: criar agendamento recorrente semanal para múltiplos contatos"
+					},
+					"response": []
+				},
+				{
+					"name": "Fluxo 3: Importar Contatos e Criar Campanha",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "arquivo",
+									"description": "CSV com: nome,email,telefone,observacao,codExterno",
+									"type": "file",
+									"src": "/path/to/contatos.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/contatos/importar",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contatos",
+								"importar"
+							]
+						},
+						"description": "Passo 1: Importar lista de contatos\\nPasso 2: Criar agendamento usando os IDs retornados"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{api_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "api_token",
+			"value": "seu_token_aqui",
+			"type": "string"
+		}
+	]
+}
