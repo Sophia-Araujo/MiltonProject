@@ -4,3 +4,6 @@ uvicorn[standard]
 pydantic
 # NOVO: ORM (SQLAlchemy)
 sqlalchemy
+celery
+redis
+twilio
